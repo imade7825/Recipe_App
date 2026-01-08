@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config'; //loads .env into process.env
 import { TypeOrmModule } from '@nestjs/typeorm'; //Enables TypeORM DB connection
 import { RecipesModule } from './recipes/recipes.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -33,5 +35,7 @@ import { RecipesModule } from './recipes/recipes.module';
     //our feature module
     RecipesModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
