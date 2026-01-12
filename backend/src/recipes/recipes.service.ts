@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Recipe } from './entities/recipe.entity';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { GetRecipesFilterDto } from './dto/get-recipes-filter.dto';
 
 //Service kümmert sich um Datenbank-Operationen und Geschäftslogik
 @Injectable()
@@ -16,11 +17,42 @@ export class RecipesService {
     private readonly recipeRepository: Repository<Recipe>,
   ) {}
 
-  //Alle Rezepte aus der Datenbank holen(inkl. Relationen)
-  async findAll(): Promise<Recipe[]> {
-    return this.recipeRepository.find({
-      relations: ['ingredients', 'categories'],
-    });
+  //Alle Rezepte aus der Datenbank holen optional filter nutzung
+  async findAll(filters: GetRecipesFilterDto): Promise<Recipe[]> {
+    const { search, category, maxDuration } = filters;
+    console.log('Filters in findAll:', filters);
+
+    //QuerBuilder wird verwendet, weil find() zu eingeschränkt wäre
+    const qb = this.recipeRepository
+      .createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.ingredients', 'ingredient')
+      .leftJoinAndSelect('recipe.categories', 'categoryEntity');
+
+    //Falls ein Suchbegriff vorhanden ist > in Titel & Beschreibung suchen
+    if (search && search.trim() !== '') {
+      qb.andWhere(
+        '(LOWER(recipe.title) LIKE LOWER(:search) OR LOWER(recipe.description) LIKE LOWER(:search))',
+        { search: `%${search.trim()}%` },
+      );
+    }
+
+    //Falls eine Kategorie übergeben wurde > nach Kategorienamen filtern
+    if (category && category.trim() !== '') {
+      qb.andWhere('LOWER(categoryEntity.name) = LOWER(:category)', {
+        category: category.trim(),
+      });
+    }
+
+    //Falls eine max. Dauer existiert > alle rezepte darunter
+    if (typeof maxDuration === 'number' && !Number.isNaN(maxDuration)) {
+      console.log('maxDuration-Filter wird angewendet mit:', maxDuration);
+      qb.andWhere('recipe.durationMinutes <= :maxDuration', { maxDuration });
+    } else {
+      console.log('KEIN maxDuration-Filter aktiv, maxDuration =', maxDuration);
+    }
+
+    //Abfrage ausführen
+    return qb.getMany();
   }
 
   //Einzelnes Rezept per ID holen
