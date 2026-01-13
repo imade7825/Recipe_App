@@ -1,5 +1,6 @@
 // Startseite unserer Recipe App im Frontend
-// Hier bauen wir später die UI
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center justify-center">
@@ -12,6 +13,12 @@ export default function HomePage() {
           Als Nächstes verbinden wir die UI mit deinem NestJS Backend und bauen
           die Rezeptübersicht.
         </p>
+        <Link
+          href="/recipes"
+          className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2 text-sm font-medium text-slate-900 hover:bg-emerald-400 transition"
+        >
+          Zur Rezeptliste
+        </Link>
       </div>
     </main>
   );
