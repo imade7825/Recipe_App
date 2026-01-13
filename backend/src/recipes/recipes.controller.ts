@@ -14,7 +14,7 @@ import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { GetRecipesFilterDto } from './dto/get-recipes-filter.dto';
-//import { max, padEnd } from 'lodash';
+import { GenerateRecipesDto } from './dto/generate-recipes.dto';
 
 //Controller: definiert die Http-Routen für Rezepte
 @Controller('recipes')
@@ -47,6 +47,12 @@ export class RecipesController {
     };
     console.log('Controller filters:', filters);
     return this.recipesService.findAll(filters);
+  }
+
+  //Post /recipes/generate
+  @Post('generate')
+  generate(@Body() body: GenerateRecipesDto) {
+    return this.recipesService.generateSuggestions(body);
   }
 
   //GET /recipes/:id

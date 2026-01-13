@@ -7,6 +7,7 @@ import { Recipe } from './entities/recipe.entity';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { GetRecipesFilterDto } from './dto/get-recipes-filter.dto';
+import { GenerateRecipesDto } from './dto/generate-recipes.dto';
 
 //Service kümmert sich um Datenbank-Operationen und Geschäftslogik
 @Injectable()
@@ -95,5 +96,31 @@ export class RecipesService {
     if (result.affected === 0) {
       throw new NotFoundException(`Recipe with id ${id} not found`);
     }
+  }
+
+  //Vorschlags-Logik für Rezepte(Recipe Generator)
+  //Nutzt intern die bestehende Filterlogik(findAll)und wählt zufällig eine Teilmenge
+  async generateSuggestions(params: GenerateRecipesDto): Promise<Recipe[]> {
+    //Wir bauen aus den Generator-Parametern ein Filter-Objekt für findAll
+    const filters: GetRecipesFilterDto = {
+      search: undefined, //aktuell keine Volltextsuche vom Generator aus
+      category: params.category,
+      maxDuration: params.maxDuration,
+    };
+
+    //Alle passenden Rezepte anhand der Filter holen
+    const allMatchingRecipes = await this.findAll(filters);
+    if (allMatchingRecipes.length === 0) {
+      //Wenn nicht passt, geben wir einfach ein leeres Array zurück
+      return [];
+    }
+    //Limit setzen (Standard: 5 Vorschläge)
+    const limit =
+      typeof params.limit === 'number' && params.limit > 0 ? params.limit : 5;
+
+    //Eine einfache Zufalls-Auswahl: Array mischen und begrenzen.
+    //Hinweis: sort + Math.random ist nicht perfekt aber völlig ausreichend
+    const shuffled = [...allMatchingRecipes].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, limit);
   }
 }
