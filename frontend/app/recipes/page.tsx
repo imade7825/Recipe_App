@@ -2,6 +2,8 @@
 //Diese Seite lädt alle Rezepte aus dem NestJS-Backend
 //und zeigt sie als einfache Kartenliste
 
+import Link from "next/link";
+
 type Category = { id: number; name: string };
 type Recipe = {
   id: number;
@@ -67,8 +69,9 @@ export default async function RecipesPage() {
         {/* Grid mit Rezeptkarten */}
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe) => (
-            <article
+            <Link
               key={recipe.id}
+              href={`/recipes/${recipe.id}`}
               className="flex flex-col overflow-hidden rounded-2xl bg-slate-800/80 shadow-lg shadow-black/30 border border-slate-700/60"
             >
               {/* Bildbereich (falls vorhanden) */}
@@ -107,7 +110,7 @@ export default async function RecipesPage() {
                   </div>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </section>
       </div>
