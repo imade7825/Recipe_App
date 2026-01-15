@@ -41,8 +41,7 @@ export class AuthService {
   //Login: Email suchen + Passwort prüfen + JWT zurückgeben
   async login(
     email: string,
-    password,
-    string,
+    password: string,
   ): Promise<{ accessToken: string }> {
     const user = await this.usersRepo.findOne({ where: { email } });
     if (!user) {

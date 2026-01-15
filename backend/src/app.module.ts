@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'; //Enables TypeORM DB connection
 import { RecipesModule } from './recipes/recipes.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -11,6 +12,9 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    //Nest muss wissen, dass es /auth/* Routen geben soll
+    AuthModule,
 
     // connect nestjs to sql database using values form .env
     TypeOrmModule.forRoot({
