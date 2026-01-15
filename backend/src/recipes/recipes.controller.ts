@@ -9,17 +9,33 @@ import {
   Delete,
   ParseIntPipe,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
+
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { GetRecipesFilterDto } from './dto/get-recipes-filter.dto';
 import { GenerateRecipesDto } from './dto/generate-recipes.dto';
 
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+
 //Controller: definiert die Http-Routen für Rezepte
 @Controller('recipes')
 export class RecipesController {
   constructor(private readonly recipesService: RecipesService) {}
+
+  //Test Route
+  @UseGuards(JwtAuthGuard)
+  @Get('private')
+  privateRoute(@Req() req: Request) {
+    return {
+      message: 'Du bist eingelogt',
+      user: req.user ?? null, //Kommt aus JwtStrategy.validate()
+    };
+  }
 
   //GET /recipes?search=...&category=...&maxDuration=...
   //Liest alle Query-Parameter ein und übergibt sie an den Service
