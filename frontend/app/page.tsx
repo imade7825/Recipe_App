@@ -10,8 +10,7 @@ export default function HomePage() {
           Next.js + Tailwind sind erfolgreich eingerichtet
         </p>
         <p className="text-sm text-slate-400">
-          Als Nächstes verbinden wir die UI mit deinem NestJS Backend und bauen
-          die Rezeptübersicht.
+           
         </p>
         <Link
           href="/recipes"
