@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import RecipeDetailClient from "./RecipeDetailClient";
 
 // Types passend zu dem Backend-Response
 type Category = { id: number; name: string };
@@ -87,54 +88,12 @@ export default async function RecipeDetailPage(props: {
         )}
 
         {recipe && (
-          <>
-            {/* Titel + Meta-Infos */}
-            <header className="space-y-3">
-              <h1 className="text-3xl md:text-4xl font-bold">{recipe.title}</h1>
-
-              <div className="flex flex-wrap items-center gap-3 text-sm">
-                <span className="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100">
-                  ⏱ {recipe.durationMinutes} min
-                </span>
-
-                <div className="flex flex-wrap gap-2">
-                  {recipe.categories?.map((cat) => (
-                    <span
-                      key={cat.id}
-                      className="rounded-full bg-emerald-600/20 px-3 py-1 text-xs text-emerald-300"
-                    >
-                      {cat.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </header>
-
-            {/* Bild, falls vorhanden */}
-            {recipe.imageUrl && (
-              <div className="overflow-hidden rounded-3xl border border-slate-700/70 shadow-lg shadow-black/40">
-                <img
-                  src={recipe.imageUrl}
-                  alt={recipe.title}
-                  className="h-64 w-full object-cover"
-                />
-              </div>
-            )}
-
-            {/* Beschreibung */}
-            <section className="space-y-2"> 
-              <h2 className="text-xl font-semibold">Beschreibung</h2>
-              <p className="text-slate-200">{recipe.description}</p>
-            </section>
-
-            {/* Zubereitungsschritte */}
-            <section className="space-y-2">
-              <h2 className="text-xl font-semibold">Zubereitung</h2>
-              <p className="whitespace-pre-line text-slate-200">
-                {recipe.instructions}
-              </p>
-            </section>
-          </>
+          <RecipeDetailClient
+            initialRecipe={recipe}
+            apiBaseUrl={
+              process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000"
+            }
+          />
         )}
       </div>
     </main>

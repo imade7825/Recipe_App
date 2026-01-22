@@ -81,9 +81,9 @@ export default function RegisterPage() {
           {loading ? "Registering..." : "Register"}
         </button>
         <p className="text-sm text-slate-300">
-          No account?{" "}
-          <Link href="/register" className="text-emerald-400 hover:underline">
-            Register
+          Already registered?{" "}
+          <Link href="/login" className="text-emerald-400 hover:underline">
+            Login
           </Link>
         </p>
       </form>
