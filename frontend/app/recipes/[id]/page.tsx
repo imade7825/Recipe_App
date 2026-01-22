@@ -45,7 +45,7 @@ async function fetchRecipe(id: number): Promise<Recipe | null> {
   return response.json();
 }
 
-// ⚠️ generateMetadata lassen wir für Ticket 9 weg, um es einfach zu halten
+// generateMetadata lassen wir für Ticket 9 weg, um es einfach zu halten
 // Wenn du später Lust hast, können wir das wieder einbauen.
 
 // Detailseite für ein Rezept
@@ -67,8 +67,7 @@ export default async function RecipeDetailPage(props: {
   try {
     recipe = await fetchRecipe(id);
   } catch (error: any) {
-    errorMessage =
-      error?.message ?? "Unknown error by loading a Recipe";
+    errorMessage = error?.message ?? "Unknown error by loading a Recipe";
   }
 
   // Wenn kein Rezept gefunden, aber auch kein Fehler -> 404
@@ -82,9 +81,7 @@ export default async function RecipeDetailPage(props: {
         {/* Fehlerbox, falls Backend kaputt o.ä. */}
         {errorMessage && (
           <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100">
-            <p className="font-semibold">
-              Fehler beim Laden dieses Rezepts
-            </p>
+            <p className="font-semibold">Fehler beim Laden dieses Rezepts</p>
             <p>{errorMessage}</p>
           </div>
         )}
@@ -93,9 +90,7 @@ export default async function RecipeDetailPage(props: {
           <>
             {/* Titel + Meta-Infos */}
             <header className="space-y-3">
-              <h1 className="text-3xl md:text-4xl font-bold">
-                {recipe.title}
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-bold">{recipe.title}</h1>
 
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <span className="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100">
@@ -127,7 +122,7 @@ export default async function RecipeDetailPage(props: {
             )}
 
             {/* Beschreibung */}
-            <section className="space-y-2">
+            <section className="space-y-2"> 
               <h2 className="text-xl font-semibold">Beschreibung</h2>
               <p className="text-slate-200">{recipe.description}</p>
             </section>
