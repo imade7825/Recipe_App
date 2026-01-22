@@ -33,7 +33,7 @@ export default function LoginPage() {
         throw new Error(data.message ?? "Login failed");
       }
 
-      // Token speichern 
+      // Token speichern
       localStorage.setItem("accessToken", data.accessToken);
 
       router.push("/recipes");
@@ -82,10 +82,11 @@ export default function LoginPage() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
         <p className="text-sm text-slate-300">
-          Already registered?{" "}
-          <Link href="/login" className="text-emerald-400 hover:underline">
-            Login
+          No account?{" "}
+          <Link href="/register" className="text-emerald-400 hover:underline">
+            Register
           </Link>
         </p>
       </form>

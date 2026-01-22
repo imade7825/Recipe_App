@@ -87,6 +87,7 @@ export class RecipesController {
 
   // PATCH /recipes/:id
   //Rezept teilweise aktualisieren
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateRecipeDto) {
     return this.recipesService.update(id, body);
@@ -94,6 +95,7 @@ export class RecipesController {
 
   //DELETE /recipes/:id
   //Rezept löschen
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.recipesService.remove(id);
