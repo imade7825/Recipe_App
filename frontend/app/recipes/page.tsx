@@ -117,9 +117,13 @@ export default function RecipesPage() {
         {/* Kopfbereich der Seite */}
         <header className="space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold">Rezepte</h1>
-          <p className="text-slate-300">
-            Suche und Filter laufen über Query-Parameter an dein NestJS-Backend.
-          </p>
+          
+          <Link
+            href="/recipes/new"
+            className="inline-flex items-center rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold hover:bg-emerald-500"
+          >
+            + New Recipe
+          </Link>
         </header>
 
         {/*Ticket 10: Search & Filter UI */}
