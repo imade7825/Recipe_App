@@ -58,11 +58,11 @@ INSERT INTO ingredients (name) VALUES
 -- RECIPES
 -- =========================
 INSERT INTO recipes (title, description, instructions, "durationMinutes", "imageUrl") VALUES
-('Simple Tomato Pasta', 'Quick and healthy tomato pasta', 'Boil pasta. Heat olive oil. Add garlic and tomato. Mix together.', 20, 'https://example.com/tomato-pasta.jpg'),
+('Simple Tomato Pasta', 'Quick and healthy tomato pasta', 'Boil pasta. Heat olive oil. Add garlic and tomato. Mix together.', 20, 'https://source.unsplash.com/1200x800/?pasta.jpg'),
 ('Chicken Curry', 'Creamy Indian-style chicken curry with coconut milk', 'Sauté onions and garlic. Add curry paste. Add chicken. Add coconut milk. Simmer 20 mins.', 30, 'https://example.com/chicken-curry.jpg'),
 ('Avocado Toast', 'Quick vegetarian breakfast with avocado and lemon', 'Toast bread. Mash avocado with lemon juice. Spread and season.', 10, 'https://example.com/avocado-toast.jpg'),
 ('Beef Stir Fry', 'Asian-style beef with vegetables and soy sauce', 'Sear beef. Add vegetables. Add soy sauce. Stir fry 5 mins.', 20, 'https://example.com/beef-stir-fry.jpg'),
-('Vegetable Soup', 'Hearty mixed vegetable soup', 'Add vegetables to broth. Simmer 30 mins.', 40, 'https://example.com/vegetable-soup.jpg'),
+('Vegetable Soup', 'Hearty mixed vegetable soup', 'Add vegetables to broth. Simmer 30 mins.', 40, 'https://source.unsplash.com/1200x800/?vegetable,soup.      jpg'),
 ('Pancakes', 'Fluffy breakfast pancakes', 'Mix flour, eggs, milk. Cook on skillet.', 20, 'https://example.com/pancakes.jpg'),
 ('Caesar Salad', 'Crispy romaine lettuce with Caesar dressing', 'Mix dressing. Toss with lettuce and croutons.', 15, 'https://example.com/caesar-salad.jpg'),
 ('Grilled Salmon', 'Lemon-herb salmon grilled to perfection', 'Season salmon. Grill 12 minutes.', 25, 'https://example.com/grilled-salmon.jpg'),
