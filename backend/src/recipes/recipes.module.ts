@@ -9,10 +9,8 @@ import { RecipeIngredient } from './entities/recipe-ingredient.entity';
 import { RecipesService } from './recipes.service';
 import { RecipesController } from './recipes.controller';
 
-//Bündelt alles rund um Rezepte
 @Module({
   imports: [
-    //registers repositories for this feature
     TypeOrmModule.forFeature([Recipe, Ingredient, Category, RecipeIngredient]),
   ],
   controllers: [RecipesController],

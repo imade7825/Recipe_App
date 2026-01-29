@@ -6,6 +6,7 @@ import { Ingredient } from './recipes/entities/ingredient.entity';
 import { Category } from './recipes/entities/category.entity';
 import { RecipeIngredient } from './recipes/entities/recipe-ingredient.entity';
 import { User } from './auth/entities/user.entity';
+import { IngredientGroup } from './ingredients/entities/ingredient-group.entity';
 
 //this datasource is used by the typeorm cli(migration generate/run)
 //it is not the same as the runtime nestjs typeormmodule.forroot config,
@@ -20,7 +21,14 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
 
   //entities define the database shema(tables + relations)
-  entities: [Recipe, Ingredient, Category, RecipeIngredient, User],
+  entities: [
+    Recipe,
+    Ingredient,
+    Category,
+    RecipeIngredient,
+    User,
+    IngredientGroup,
+  ],
 
   //migration files will be stored here
   migrations: ['src/migrations/*.ts'],

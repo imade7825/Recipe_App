@@ -7,6 +7,7 @@ DELETE FROM recipe_ingredients;
 DELETE FROM recipe_categories;
 DELETE FROM recipes;
 DELETE FROM ingredients;
+DELETE FROM ingredient_groups;
 DELETE FROM categories;
 
 -- =========================
@@ -23,52 +24,143 @@ INSERT INTO categories (name) VALUES
   ('Low Carb');
 
 -- =========================
--- INGREDIENTS
+-- INGREDIENT GROUPS
 -- =========================
-INSERT INTO ingredients (name) VALUES
-  ('Tomato'),
-  ('Olive Oil'),
-  ('Garlic'),
-  ('Pasta'),
-  ('Basil'),
-  ('Chicken'),
-  ('Coconut Milk'),
-  ('Bread'),
-  ('Avocado'),
-  ('Beef'),
-  ('Soy Sauce'),
-  ('Carrot'),
-  ('Onion'),
-  ('Celery'),
-  ('Flour'),
-  ('Egg'),
-  ('Milk'),
-  ('Lettuce'),
-  ('Croutons'),
-  ('Parmesan'),
-  ('Salmon'),
-  ('Lemon'),
-  ('Spaghetti'),
-  ('Pancetta'),
-  ('Feta'),
-  ('Cucumber'),
-  ('Olives');
+INSERT INTO ingredient_groups (name) VALUES
+  ('Vegetables'),
+  ('Fruits'),
+  ('Meat'),
+  ('Dairy'),
+  ('Pantry'),
+  ('Spices'),
+  ('Other');
+
+-- =========================
+-- INGREDIENTS (with group_id)
+-- =========================
+
+-- Vegetables
+INSERT INTO ingredients (name, group_id)
+SELECT 'Tomato', id FROM ingredient_groups WHERE name = 'Vegetables';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Garlic', id FROM ingredient_groups WHERE name = 'Vegetables';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Carrot', id FROM ingredient_groups WHERE name = 'Vegetables';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Onion', id FROM ingredient_groups WHERE name = 'Vegetables';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Celery', id FROM ingredient_groups WHERE name = 'Vegetables';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Lettuce', id FROM ingredient_groups WHERE name = 'Vegetables';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Cucumber', id FROM ingredient_groups WHERE name = 'Vegetables';
+
+-- Fruits
+INSERT INTO ingredients (name, group_id)
+SELECT 'Avocado', id FROM ingredient_groups WHERE name = 'Fruits';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Lemon', id FROM ingredient_groups WHERE name = 'Fruits';
+
+-- Meat
+INSERT INTO ingredients (name, group_id)
+SELECT 'Chicken', id FROM ingredient_groups WHERE name = 'Meat';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Beef', id FROM ingredient_groups WHERE name = 'Meat';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Salmon', id FROM ingredient_groups WHERE name = 'Meat';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Pancetta', id FROM ingredient_groups WHERE name = 'Meat';
+
+-- Dairy
+INSERT INTO ingredients (name, group_id)
+SELECT 'Milk', id FROM ingredient_groups WHERE name = 'Dairy';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Egg', id FROM ingredient_groups WHERE name = 'Dairy';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Parmesan', id FROM ingredient_groups WHERE name = 'Dairy';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Feta', id FROM ingredient_groups WHERE name = 'Dairy';
+
+-- Pantry
+INSERT INTO ingredients (name, group_id)
+SELECT 'Olive Oil', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Pasta', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Spaghetti', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Flour', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Bread', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Soy Sauce', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Coconut Milk', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Croutons', id FROM ingredient_groups WHERE name = 'Pantry';
+INSERT INTO ingredients (name, group_id)
+SELECT 'Olives', id FROM ingredient_groups WHERE name = 'Pantry';
+
+-- Other / Spices (dein Mapping kann später besser werden)
+INSERT INTO ingredients (name, group_id)
+SELECT 'Basil', id FROM ingredient_groups WHERE name = 'Spices';
+
+-- =========================
+-- ASSIGN INGREDIENTS TO GROUPS
+-- =========================
+
+-- Vegetables
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Vegetables')
+WHERE name IN ('Tomato','Garlic','Carrot','Onion','Celery','Lettuce','Cucumber');
+
+-- Fruits
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Fruits')
+WHERE name IN ('Avocado','Lemon');
+
+-- Meat (incl. fish + cured meat for now)
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Meat')
+WHERE name IN ('Beef','Chicken','Salmon','Pancetta');
+
+-- Dairy
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Dairy')
+WHERE name IN ('Milk','Parmesan','Feta');
+
+-- Pantry
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Pantry')
+WHERE name IN ('Olive Oil','Pasta','Spaghetti','Flour','Bread','Croutons','Soy Sauce','Coconut Milk','Olives');
+
+-- Spices / Herbs
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Spices')
+WHERE name IN ('Basil');
+
+-- Other
+UPDATE ingredients
+SET group_id = (SELECT id FROM ingredient_groups WHERE name = 'Other')
+WHERE name IN ('Egg');
+
+
 
 -- =========================
 -- RECIPES
 -- =========================
 INSERT INTO recipes (title, description, instructions, "durationMinutes", "imageUrl") VALUES
-('Simple Tomato Pasta', 'Quick and healthy tomato pasta', 'Boil pasta. Heat olive oil. Add garlic and tomato. Mix together.', 20, 'https://source.unsplash.com/1200x800/?pasta.jpg'),
-('Chicken Curry', 'Creamy Indian-style chicken curry with coconut milk', 'Sauté onions and garlic. Add curry paste. Add chicken. Add coconut milk. Simmer 20 mins.', 30, 'https://example.com/chicken-curry.jpg'),
-('Avocado Toast', 'Quick vegetarian breakfast with avocado and lemon', 'Toast bread. Mash avocado with lemon juice. Spread and season.', 10, 'https://example.com/avocado-toast.jpg'),
-('Beef Stir Fry', 'Asian-style beef with vegetables and soy sauce', 'Sear beef. Add vegetables. Add soy sauce. Stir fry 5 mins.', 20, 'https://example.com/beef-stir-fry.jpg'),
-('Vegetable Soup', 'Hearty mixed vegetable soup', 'Add vegetables to broth. Simmer 30 mins.', 40, 'https://source.unsplash.com/1200x800/?vegetable,soup.      jpg'),
-('Pancakes', 'Fluffy breakfast pancakes', 'Mix flour, eggs, milk. Cook on skillet.', 20, 'https://example.com/pancakes.jpg'),
-('Caesar Salad', 'Crispy romaine lettuce with Caesar dressing', 'Mix dressing. Toss with lettuce and croutons.', 15, 'https://example.com/caesar-salad.jpg'),
-('Grilled Salmon', 'Lemon-herb salmon grilled to perfection', 'Season salmon. Grill 12 minutes.', 25, 'https://example.com/grilled-salmon.jpg'),
-('Spaghetti Carbonara', 'Italian pasta with egg, cheese and pancetta', 'Cook pasta. Fry pancetta. Mix with egg and cheese. Combine.', 25, 'https://example.com/carbonara.jpg'),
-('Greek Salad', 'Fresh salad with feta and olives', 'Chop vegetables. Add feta and olive oil.', 10, 'https://example.com/greek-salad.jpg'),
-('Tomato Basil Soup', 'Smooth tomato soup with basil', 'Cook tomatoes with garlic. Blend. Simmer.', 30, 'https://example.com/tomato-basil-soup.jpg');
+('Simple Tomato Pasta', 'Quick and healthy tomato pasta', 'Boil pasta. Heat olive oil. Add garlic and tomato. Mix together.', 20, 'https://source.unsplash.com/1200x800/?pasta'),
+('Chicken Curry', 'Creamy Indian-style chicken curry with coconut milk', 'Sauté onions and garlic. Add curry paste. Add chicken. Add coconut milk. Simmer 20 mins.', 30, 'https://example.com/chicken-curry'),
+('Avocado Toast', 'Quick vegetarian breakfast with avocado and lemon', 'Toast bread. Mash avocado with lemon juice. Spread and season.', 10, 'https://example.com/avocado-toast'),
+('Beef Stir Fry', 'Asian-style beef with vegetables and soy sauce', 'Sear beef. Add vegetables. Add soy sauce. Stir fry 5 mins.', 20, 'https://example.com/beef-stir-fry'),
+('Vegetable Soup', 'Hearty mixed vegetable soup', 'Add vegetables to broth. Simmer 30 mins.', 40, 'https://source.unsplash.com/1200x800/?vegetable,soup'),
+('Pancakes', 'Fluffy breakfast pancakes', 'Mix flour, eggs, milk. Cook on skillet.', 20, 'https://example.com/pancakes'),
+('Caesar Salad', 'Crispy romaine lettuce with Caesar dressing', 'Mix dressing. Toss with lettuce and croutons.', 15, 'https://example.com/caesar-salad'),
+('Grilled Salmon', 'Lemon-herb salmon grilled to perfection', 'Season salmon. Grill 12 minutes.', 25, 'https://example.com/grilled-salmon'),
+('Spaghetti Carbonara', 'Italian pasta with egg, cheese and pancetta', 'Cook pasta. Fry pancetta. Mix with egg and cheese. Combine.', 25, 'https://example.com/carbonara'),
+('Greek Salad', 'Fresh salad with feta and olives', 'Chop vegetables. Add feta and olive oil.', 10, 'https://example.com/greek-salad'),
+('Tomato Basil Soup', 'Smooth tomato soup with basil', 'Cook tomatoes with garlic. Blend. Simmer.', 30, 'https://example.com/tomato-basil-soup');
 
 -- =========================
 -- RECIPE ↔ CATEGORY
