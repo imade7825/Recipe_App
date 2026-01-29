@@ -6,14 +6,14 @@ import { Module } from '@nestjs/common';
 //TypeOrmModule.forFeature(...) registriert Repositories für Entities in diesem Modul
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+//wir registrieren das Repository für IngredientGroup
+import { IngredientGroup } from './entities/ingredient-group.entity';
+
 //Controller derfiniert die HTTP-Routen
 import { IngredientsController } from './ingredients.controller';
 
 //Service enthält die DB-Logik
 import { IngredientsService } from './ingredients.service';
-
-//wir registrieren das Repository für IngredientGroup
-import { IngredientGroup } from './entities/ingredient-group.entity';
 
 @Module({
   //macht groupRepo in IngredientsService verfügbar

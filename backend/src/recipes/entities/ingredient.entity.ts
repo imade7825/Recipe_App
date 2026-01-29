@@ -8,7 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { RecipeIngredient } from './recipe-ingredient.entity';
-import { IngredientGroup } from './ingredient-group.entity';
+import { IngredientGroup } from 'src/ingredients/entities/ingredient-group.entity';
 
 @Entity('ingredients')
 export class Ingredient {
