@@ -20,18 +20,21 @@ export class RecipesService {
 
   //Alle Rezepte aus der Datenbank holen optional filter nutzung
   async findAll(filters: GetRecipesFilterDto): Promise<Recipe[]> {
-    const { search, category, maxDuration } = filters;
+    const { search, category, maxDuration, ingredientIds, maxMissing } =
+      filters;
     console.log('Filters in findAll:', filters);
 
     //QuerBuilder wird verwendet, weil find() zu eingeschränkt wäre
-    const qb = this.recipeRepository
+    const idsQb = this.recipeRepository
       .createQueryBuilder('recipe')
-      .leftJoinAndSelect('recipe.ingredients', 'ingredient')
-      .leftJoinAndSelect('recipe.categories', 'categoryEntity');
+      .leftJoin('recipe.ingredients', 'ingredient')
+      .leftJoin('recipe.categories', 'categoryEntity')
+      .select('recipe.id', 'id')
+      .groupBy('recipe.id');
 
     //Falls ein Suchbegriff vorhanden ist > in Titel & Beschreibung suchen
     if (search && search.trim() !== '') {
-      qb.andWhere(
+      idsQb.andWhere(
         '(LOWER(recipe.title) LIKE LOWER(:search) OR LOWER(recipe.description) LIKE LOWER(:search))',
         { search: `%${search.trim()}%` },
       );
@@ -39,7 +42,7 @@ export class RecipesService {
 
     //Falls eine Kategorie übergeben wurde > nach Kategorienamen filtern
     if (category && category.trim() !== '') {
-      qb.andWhere('LOWER(categoryEntity.name) = LOWER(:category)', {
+      idsQb.andWhere('LOWER(categoryEntity.name) = LOWER(:category)', {
         category: category.trim(),
       });
     }
@@ -47,11 +50,40 @@ export class RecipesService {
     //Falls eine max. Dauer existiert > alle rezepte darunter
     if (typeof maxDuration === 'number' && !Number.isNaN(maxDuration)) {
       console.log('maxDuration-Filter wird angewendet mit:', maxDuration);
-      qb.andWhere('recipe.durationMinutes <= :maxDuration', { maxDuration });
+      idsQb.andWhere('recipe.durationMinutes <= :maxDuration', { maxDuration });
     } else {
       console.log('KEIN maxDuration-Filter aktiv, maxDuration =', maxDuration);
     }
 
+    if (ingredientIds && ingredientIds.length > 0) {
+      const maxIngredientMissig =
+        typeof maxMissing === 'number' && !Number.isNaN(maxMissing)
+          ? maxMissing
+          : 2;
+      //matched count
+      idsQb.addSelect(
+        `COUNT(DISTINCT CASE WHEN ri.ingredientId IN (:...ingredientIds) THEN ri.ingredientId END)`,
+        'matched',
+      );
+      //total count
+      idsQb.addSelect(`COUNT(DISTINCT ri.ingredientId)`, 'total');
+
+      //Having missing <= maxIngredientMissing
+      idsQb.having(
+        `(COUNT(DISTINCT ri.ingredientId) - COUNT(DISTINCT CASE WHEN ri.ingredientId IN (:...ingredientIds) THEN ri.ingredientId END)) <= :maxMissing`,
+        { ingredientIds, maxMissing: maxIngredientMissig },
+      );
+    }
+    const rows = await idsQb.getRawMany<{ id: string }>();
+    const ids = rows.map((row) => Number(row.id)).filter(Number.isFinite);
+
+    if (ids.length === 0) return [];
+
+    const qb = this.recipeRepository
+      .createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.ingredients', 'ingredient')
+      .leftJoinAndSelect('recipe.categrories', 'categoryEntity')
+      .where('recipe.id IN (:...ids)', { ids });
     //Abfrage ausführen
     return qb.getMany();
   }
