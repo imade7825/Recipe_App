@@ -5,6 +5,8 @@ import { RecipesModule } from './recipes/recipes.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+//importiert das neue Modul
+import { IngredientsModule } from './ingredients/ingredients.module';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     //our feature module
     RecipesModule,
+    IngredientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
