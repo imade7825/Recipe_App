@@ -44,6 +44,8 @@ export class RecipesController {
     @Query('search') search?: string,
     @Query('category') category?: string,
     @Query('maxDuration') maxDurationRaw?: string,
+    @Query('ingredientIds') ingredientIdsRaw?: string,
+    @Query('maxMissing') maxMissingRaw?: string,
   ) {
     //Query-Prameter kommen als Strings an > hier wird explizit umgewandelt
     //maxDuration kann als String kommen > in Zahl umwandeln
@@ -55,11 +57,33 @@ export class RecipesController {
       }
     }
 
+    // ingredientIds "33,34,37" -> [33,34,37]
+    let ingredientIds: number[] | undefined = undefined;
+    if (ingredientIdsRaw && ingredientIdsRaw.trim() !== '') {
+      ingredientIds = ingredientIdsRaw
+        .split(',')
+        .map((x) => Number(x.trim()))
+        .filter((n) => Number.isFinite(n));
+    }
+
+    // maxMissing muss 0 erlauben!
+    let maxMissing: number | undefined = undefined;
+    if (
+      maxMissingRaw !== undefined &&
+      maxMissingRaw !== null &&
+      maxMissingRaw !== ''
+    ) {
+      const parsed = Number(maxMissingRaw);
+      if (!Number.isNaN(parsed)) maxMissing = parsed;
+    }
+
     //Neues Filter Objekt mit korrektem Typen
     const filters: GetRecipesFilterDto = {
       search,
       category,
       maxDuration,
+      ingredientIds,
+      maxMissing,
     };
     console.log('Controller filters:', filters);
     return this.recipesService.findAll(filters);

@@ -9,9 +9,7 @@ export default function HomePage() {
         <p className="text-slate-300">
           Next.js + Tailwind sind erfolgreich eingerichtet
         </p>
-        <p className="text-sm text-slate-400">
-           
-        </p>
+        <p className="text-sm text-slate-400"></p>
         <Link
           href="/recipes"
           className="inline-flex items-center justify-center rounded-full bg-emerald-500 px-5 py-2 text-sm font-medium text-slate-900 hover:bg-emerald-400 transition"

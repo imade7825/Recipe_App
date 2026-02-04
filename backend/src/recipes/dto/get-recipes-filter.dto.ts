@@ -6,4 +6,6 @@ export class GetRecipesFilterDto {
   search?: string;
   category?: string;
   maxDuration?: number;
+  ingredientIds?: number[];
+  maxMissing?: number;
 }

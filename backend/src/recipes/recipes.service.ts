@@ -20,39 +20,95 @@ export class RecipesService {
 
   //Alle Rezepte aus der Datenbank holen optional filter nutzung
   async findAll(filters: GetRecipesFilterDto): Promise<Recipe[]> {
-    const { search, category, maxDuration } = filters;
+    // Wir lesen alle Filter aus dem DTO raus
+    const { search, category, maxDuration, ingredientIds, maxMissing } =
+      filters;
+
+    // Debug-Log: zeigt dir, welche Filter wirklich ankommen
     console.log('Filters in findAll:', filters);
 
-    //QuerBuilder wird verwendet, weil find() zu eingeschränkt wäre
-    const qb = this.recipeRepository
+    // 1) ERSTER QUERY: wir holen zuerst nur die IDs der passenden Rezepte
+    //    (das ist wichtig, weil HAVING/COUNT Filter sonst mit relations + joins schnell kaputt gehen kann)
+    const idsQb = this.recipeRepository
+      // QueryBuilder auf der Tabelle "recipes" mit Alias "recipe"
       .createQueryBuilder('recipe')
-      .leftJoinAndSelect('recipe.ingredients', 'ingredient')
-      .leftJoinAndSelect('recipe.categories', 'categoryEntity');
+      // WICHTIG: join auf recipe.ingredients mit Alias "ri" (RecipeIngredient)
+      // Wir brauchen das später für COUNT / HAVING
+      .leftJoin('recipe.ingredients', 'ri')
+      // Join auf categories (für category Filter)
+      .leftJoin('recipe.categories', 'categoryEntity')
+      // Wir selektieren nur die ID, damit der Query "leicht" bleibt
+      .select('recipe.id', 'id')
+      // GroupBy ist Pflicht, weil wir COUNT/HAVING machen
+      .groupBy('recipe.id');
 
-    //Falls ein Suchbegriff vorhanden ist > in Titel & Beschreibung suchen
+    // 2) SEARCH Filter: Titel oder Beschreibung enthält "search"
     if (search && search.trim() !== '') {
-      qb.andWhere(
+      idsQb.andWhere(
         '(LOWER(recipe.title) LIKE LOWER(:search) OR LOWER(recipe.description) LIKE LOWER(:search))',
         { search: `%${search.trim()}%` },
       );
     }
 
-    //Falls eine Kategorie übergeben wurde > nach Kategorienamen filtern
+    // 3) CATEGORY Filter: exakter Kategoriename (case-insensitive)
     if (category && category.trim() !== '') {
-      qb.andWhere('LOWER(categoryEntity.name) = LOWER(:category)', {
+      idsQb.andWhere('LOWER(categoryEntity.name) = LOWER(:category)', {
         category: category.trim(),
       });
     }
 
-    //Falls eine max. Dauer existiert > alle rezepte darunter
+    // 4) maxDuration Filter: nur Rezepte <= maxDuration Minuten
     if (typeof maxDuration === 'number' && !Number.isNaN(maxDuration)) {
-      console.log('maxDuration-Filter wird angewendet mit:', maxDuration);
-      qb.andWhere('recipe.durationMinutes <= :maxDuration', { maxDuration });
-    } else {
-      console.log('KEIN maxDuration-Filter aktiv, maxDuration =', maxDuration);
+      idsQb.andWhere('recipe.durationMinutes <= :maxDuration', { maxDuration });
     }
 
-    //Abfrage ausführen
+    // 5) Ingredient-Filter mit "maxMissing":
+    //    Idee: Missing = totalIngredients - matchedIngredients
+    //    -> Missing muss <= maxMissing sein
+    if (ingredientIds && ingredientIds.length > 0) {
+      // Wenn maxMissing nicht gesetzt ist, nehmen wir Standard = 2
+      const maxIngredientMissing =
+        typeof maxMissing === 'number' && !Number.isNaN(maxMissing)
+          ? maxMissing
+          : 2;
+
+      // matched = wie viele Zutaten des Rezepts sind in ingredientIds enthalten
+      idsQb.addSelect(
+        `COUNT(DISTINCT CASE WHEN ri.ingredientId IN (:...ingredientIds) THEN ri.ingredientId END)`,
+        'matched',
+      );
+
+      // total = wie viele Zutaten hat das Rezept insgesamt
+      idsQb.addSelect(`COUNT(DISTINCT ri.ingredientId)`, 'total');
+
+      // HAVING: (total - matched) <= maxMissing
+      idsQb.having(
+        `(COUNT(DISTINCT ri.ingredientId) - COUNT(DISTINCT CASE WHEN ri.ingredientId IN (:...ingredientIds) THEN ri.ingredientId END)) <= :maxMissing`,
+        { ingredientIds, maxMissing: maxIngredientMissing },
+      );
+    }
+
+    // 6) Query ausführen -> Rohdaten (nur IDs)
+    const rows = await idsQb.getRawMany<{ id: string }>();
+
+    // IDs sauber in number umwandeln
+    const ids = rows.map((row) => Number(row.id)).filter(Number.isFinite);
+
+    // Wenn keine IDs gefunden wurden -> leeres Ergebnis
+    if (ids.length === 0) return [];
+
+    // 7) ZWEITER QUERY: Jetzt laden wir die echten Rezept-Objekte inkl. Relations
+    const qb = this.recipeRepository
+      // QueryBuilder wieder auf recipes
+      .createQueryBuilder('recipe')
+      // Zutaten-Relation laden
+      .leftJoinAndSelect('recipe.ingredients', 'ingredients')
+      // Kategorien-Relation laden (WICHTIG: richtig geschrieben!)
+      .leftJoinAndSelect('recipe.categories', 'categories')
+      // nur die IDs, die wir vorher bestimmt haben
+      .where('recipe.id IN (:...ids)', { ids });
+
+    // 8) Fertige Rezepte zurückgeben
     return qb.getMany();
   }
 
