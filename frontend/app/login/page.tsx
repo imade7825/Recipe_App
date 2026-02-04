@@ -35,6 +35,8 @@ export default function LoginPage() {
 
       // Token speichern
       localStorage.setItem("accessToken", data.accessToken);
+      window.dispatchEvent(new Event("authChanged"));
+
 
       router.push("/recipes");
     } catch (err: any) {
